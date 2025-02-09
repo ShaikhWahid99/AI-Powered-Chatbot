@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ColorRing } from "react-loader-spinner";
+import { useEffect } from "react";
 
 function App() {
   const [prompt, setPrompt] = useState("");
@@ -24,17 +25,28 @@ function App() {
     const result = await model.generateContent(prompt);
 
     // getting the response from the model
-    console.log(result.response.text());
-    setResponse([
+    // console.log(result.response.text());
+
+    const newResponse = [
       ...response,
       {
         prompt: prompt,
         response: result.response.text(),
       },
-    ]);
+    ];
+    setResponse(newResponse);
     setPrompt("");
     setLoading(false);
+    localStorage.setItem("chatbotResponse", JSON.stringify(newResponse));
   }
+
+  useEffect(() => {
+    const data = localStorage.getItem("chatbotResponse");
+    console.log("data", data);
+    if (data) {
+      setResponse(JSON.parse(data));
+    }
+  }, []);
 
   return (
     <>
@@ -42,7 +54,7 @@ function App() {
       <div className="chatbot_container">
         <div className="chatbot_response_container">
           <p>Hi, how can I help you today?</p>
-          {response.map((res, index) => (
+          {response?.map((res, index) => (
             <div className="response">
               <p className="chatbot_prompt">
                 <strong>You : </strong> {res.prompt}
