@@ -48,6 +48,17 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    const chatContainer = document.querySelector(".chatbot_response_container");
+    if (chatContainer) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+  }, [response, loading]);
+
+  function handleKeyPress(e) {
+    if (e.key === "Enter") fetchChatResponseFromGemini();
+  }
+
   return (
     <>
       <h1 className="heading">AI ChatBot</h1>
@@ -67,28 +78,26 @@ function App() {
           ))}
 
           {loading && (
-            <ColorRing
-              visible={true}
-              height="80"
-              width="80"
-              ariaLabel="color-ring-loading"
-              wrapperStyle={{}}
-              wrapperClass="color-ring-wrapper"
-              colors={["#e15b64", "#f47e60", "#f8b26a", "#abbd81", "#849b87"]}
-            />
+            <div className="loader-container">
+              <ColorRing
+                visible={true}
+                height="80"
+                width="80"
+                ariaLabel="color-ring-loading"
+                colors={["#e15b64", "#f47e60", "#f8b26a", "#abbd81", "#849b87"]}
+              />
+            </div>
           )}
         </div>
 
         <div className="chatbot_input">
           <input
             type="text"
-            name="input"
-            placeholder="enter your questions"
+            placeholder="Type a message..."
             className="input"
-            onChange={(e) => {
-              setPrompt(e.target.value);
-            }}
             value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={handleKeyPress}
           />
           <button type="button" onClick={fetchChatResponseFromGemini}>
             submit
